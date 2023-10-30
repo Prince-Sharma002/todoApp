@@ -1,0 +1,90 @@
+body{
+    text-align: center;
+    font-family: Overlock;
+    margin: 0px;
+}
+
+html,body
+{
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    overflow-x: hidden;
+}
+
+h1{
+    font-size: 6rem !important;
+    font-family: Amatic SC;
+}
+
+.gInput{
+    font-style: italic;
+    color: rgb(115 115 115);
+    letter-spacing: 2px;
+}
+
+.add-button{
+    font-family: Staatliches;
+    letter-spacing: 1px;
+    text-align-center;
+    width : 5rem;
+}
+
+h2{
+    font-family: Staatliches;
+    color: rgb(51, 51, 51);
+}
+
+.ItemDiv{
+    letter-spacing: 2px;
+    border: 2px solid rgb(95, 87, 87) !important;
+    text-align:left;
+}
+
+ul{
+    list-style-type: none;
+    font-style: italic;
+    color: rgb(77, 77, 77);
+
+  >li{
+      display :flex;
+      justify-content: space-between;
+  }
+  
+}
+
+.delete-button{
+    font-family: Staatliches;
+    letter-spacing: 1px;
+    border: 2px solid white;
+    border-style: solid;
+    padding: 0.21rem;
+    border-color: white white white rgb(14 165 233);
+}
+
+.delete-button:hover
+{
+    background-color: rgb(194, 24, 61);
+    color: white;
+}
+
+.checkbox{
+    cursor: pointer;
+}
+
+.check{
+    text-decoration-line: line-through;
+}
+
+.flag {
+    display: table;
+    width: 100%;
+}
+
+.footer{
+  > div{
+    >span{
+      cursor:pointer;
+    }
+  }
+}
