@@ -24,15 +24,54 @@ const TodoList = () => {
 
   const addToG = (element) => {
     if (element !== '') {
-      const item = {
-        id: Date.now(),
-        name: element,
-        check: false,
-      };
+      const timePattern = /(\d{1,2}:\d{2} [AaPp][Mm])/;
+      const match = element.match(timePattern);
 
-      setItems([...items, item]);
-      changeText();
-      addInLocalStorage([...items, item]);
+      if (match) {
+        const time = match[0];
+        const item = {
+          id: Date.now(),
+          name: element,
+          time: time,
+          check: false,
+        };
+
+        setItems([...items, item]);
+        changeText();
+        addInLocalStorage([...items, item]);
+
+        // Calculate the time in milliseconds until the notification
+        const now = new Date();
+        const [timeStr, ampm] = time.split(' ');
+        const [hours, minutes] = timeStr.split(':');
+        let notificationTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+
+        // Adjust for AM/PM
+        
+        if (ampm.toLowerCase() === 'pm' && hours < 12) {
+          notificationTime.setHours(notificationTime.getHours() + 12);
+        } else if (ampm.toLowerCase() === 'am'  && hours === 12) {
+          notificationTime.setHours(notificationTime.getHours() - 12);
+        }
+
+        const timeUntilNotification = notificationTime - now;
+
+        // Schedule the notification
+        setTimeout(() => {
+          speak(`sir time to , ${item.name}`);
+          toast(`Time to "${item.name}"`, { autoClose: 10000 });
+        }, timeUntilNotification);
+      } else {
+        const item = {
+          id: Date.now(),
+          name: element,
+          check: false,
+        };
+
+        setItems([...items, item]);
+        changeText();
+        addInLocalStorage([...items, item]);
+      }
 
       setInputValue('');
     }
@@ -70,10 +109,15 @@ const TodoList = () => {
     setTranscript(result);
     const resultLC = result.toLowerCase();
     if (resultLC.includes("add") || resultLC.includes("insert")) {
-      const item = result.split(" ").slice(1).join(" ");
+      let item = result.split(" ").slice(1).join(" ");
+
+      // Replace "p.m." with "PM" and "a.m." with "AM"
+      item = item.replace(/p\.m\./gi, "PM").replace(/a\.m\./gi, "AM");
+
       speak(",added sir");
       addToG(item);
     }
+
     else if (resultLC.includes("delete all")) {
       deleteAll();
     }
@@ -211,6 +255,10 @@ const TodoList = () => {
 
   return (
     <div className="container mx-auto p-0 m-0">
+      
+      
+      
+      
       <h1>To-Do</h1>
       <form
         className="gForm px-4 py-1  place-content-center"
@@ -243,13 +291,12 @@ const TodoList = () => {
         {items.length === 0 ? <p>No To do's</p> : display(items)}
       </div>
 
-
       <div className='p-2 absolute bottom-20 right-0 mt-4 mb-2  border-2 text-left bg-zinc-100 rounded-lg me-2'>
         <h7 className="font-bold ">Transcript:</h7>
         <p className='text-xs font-thin tracking-tighter text-gray-700'> {transcript}... </p>
       </div>
       
-      <div className="footer h-16 z-0 bg-slate-600/20 w-full absolute bottom-0
+      <div className="footer h-16 z-0 bg-slate-600/20 w-full absolute bottom-0 left-0
                       flex justify-center items-center space-x-4 p-10">
         
 
@@ -287,6 +334,8 @@ const TodoList = () => {
         <button onClick={notify} > Nootify </button>
         < ToastContainer />
       </div> */}
+
+      <ToastContainer />
 
     </div>
   );
