@@ -47,10 +47,10 @@ const TodoList = () => {
         let notificationTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
 
         // Adjust for AM/PM
-        
+
         if (ampm.toLowerCase() === 'pm' && hours < 12) {
           notificationTime.setHours(notificationTime.getHours() + 12);
-        } else if (ampm.toLowerCase() === 'am'  && hours === 12) {
+        } else if (ampm.toLowerCase() === 'am' && hours === 12) {
           notificationTime.setHours(notificationTime.getHours() - 12);
         }
 
@@ -58,7 +58,7 @@ const TodoList = () => {
 
         // Schedule the notification
         setTimeout(() => {
-          speak(`sir time to , ${item.name}`);
+          speak(`sir time to, ${item.name}`);
           toast(`Time to "${item.name}"`, { autoClose: 10000 });
         }, timeUntilNotification);
       } else {
@@ -122,17 +122,17 @@ const TodoList = () => {
       deleteAll();
     }
     else if (resultLC.includes("plan")) {
-          if (items.length > 0 ) {
-            const todayTodo = items
-              .filter((item) => item.check === false)
-              .map((item) => item.name).join(', ');
+      if (items.length > 0) {
+        const todayTodo = items
+          .filter((item) => item.check === false)
+          .map((item) => item.name).join(', ');
 
-            const msg = `sir you need too , ${todayTodo}`;
-            speak(msg);
-          }
-          else {
-            speak("there is no task sir");
-          }
+        const msg = `sir you need too , ${todayTodo}`;
+        speak(msg);
+      }
+      else {
+        speak("there is no task sir");
+      }
     }
     else if (resultLC.includes("time")) {
       speak(`its ${time.getHours()} ${time.getMinutes()} `);
@@ -255,10 +255,10 @@ const TodoList = () => {
 
   return (
     <div className="container mx-auto p-0 m-0">
-      
-      
-      
-      
+
+
+
+
       <h1>To-Do</h1>
       <form
         className="gForm px-4 py-1  place-content-center"
@@ -292,13 +292,13 @@ const TodoList = () => {
       </div>
 
       <div className='p-2 absolute bottom-20 right-0 mt-4 mb-2  border-2 text-left bg-zinc-100 rounded-lg me-2'>
-        <h7 className="font-bold ">Transcript:</h7>
+        <h6 className="font-bold ">Transcript:</h6>
         <p className='text-xs font-thin tracking-tighter text-gray-700'> {transcript}... </p>
       </div>
-      
+
       <div className="footer h-16 z-0 bg-slate-600/20 w-full absolute bottom-0 left-0
                       flex justify-center items-center space-x-4 p-10">
-        
+
 
         <div className="leftIcons w-full" >
           {Clock()}
