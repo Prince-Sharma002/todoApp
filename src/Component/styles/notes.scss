@@ -1,0 +1,53 @@
+.notes{
+  padding : 2rem 5rem;
+}
+
+
+.NotesEdit{
+  height : 10rem;
+}
+
+
+.notescard{
+  text-align : left;
+  padding : 2rem 1rem;
+  height : 15rem;
+  width : 15rem;
+  border : 1px solid white;
+  margin : 2rem 1rem;
+  >div{
+    display : flex;
+    flex-direction : column;
+    justify-content : space-between;
+
+    >section{
+      height : 10rem;
+      overflow-y : auto;
+      text-wrap : no-wrap;
+      margin-bottom : 1rem;
+      text-wrap : wrap;
+
+      &::-webkit-scrollbar {
+        width : 5px;
+      }
+        
+    }
+
+    
+  }  
+}
+
+@media screen and (max-width : 600px ){
+  .notes{
+    padding : 2rem 1rem;
+  }
+
+  .notescard{
+    margin : 1rem auto;
+    
+    &:first-child {
+      margin-top : 4rem;
+    }
+    
+  }  
+}

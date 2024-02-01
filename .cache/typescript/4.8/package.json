@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "dependencies": {
+    "types-registry": "^0.1.681"
+  },
+  "devDependencies": {
+    "@types/annyang": "^2.6.5",
+    "@types/babel__code-frame": "^7.0.5",
+    "@types/babel__core": "^7.20.3",
+    "@types/babel__generator": "^7.6.6",
+    "@types/babel__template": "^7.4.3",
+    "@types/babel__traverse": "^7.20.3",
+    "@types/gensync": "^1.0.2",
+    "@types/invariant": "^2.2.37",
+    "@types/node": "^20.8.10",
+    "@types/notify": "0.0.34",
+    "@types/react": "^18.2.48",
+    "@types/react-big-calendar": "^1.8.8",
+    "@types/react-datepicker": "^4.19.5",
+    "@types/react-dom": "^18.2.18",
+    "@types/react-speech-recognition": "^3.9.5",
+    "@types/semver": "^7.5.4"
+  }
+}

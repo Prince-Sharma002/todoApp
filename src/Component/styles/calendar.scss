@@ -1,0 +1,55 @@
+.inputDiv{
+  display: flex;
+  justify-content:center;
+  gap: 50px;
+  border : 2px solid gray;
+  border-radius : 10px;
+  width : fit-content;
+  padding : 2rem 1rem;
+  margin : 0 auto;
+  margin-bottom : 8rem;
+}
+
+.addstyle{
+  text-align:center;
+  outline : none;
+}
+
+
+.addButton{
+  font-family: Staatliches;
+  letter-spacing: 1px;
+  text-align : center;
+  width : 5rem;
+}
+
+@media screen and ( max-width : 500px ){
+  .calendar{
+    display : flex;
+    flex-direction : column;
+  }
+  
+  
+  .inputDiv{
+    flex-direction : column;
+    margin : 0;
+    width : 100%;
+    gap : 10px;
+    
+  }
+  .endDate{
+        width : 100%;
+  }
+  .startDate{
+        width : 100%;
+  }      
+
+  .rbc-toolbar{
+          margin-top : 2rem;
+          margin-bottom : 2rem;
+          display : flex;
+          flex-direction : column;
+  }
+
+          
+}

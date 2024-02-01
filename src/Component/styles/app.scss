@@ -2,6 +2,7 @@ body{
     text-align: center;
     font-family: Overlock;
     margin: 0px;
+    background-color : black;
 }
 
 html,body
@@ -15,19 +16,28 @@ html,body
 h1{
     font-size: 6rem !important;
     font-family: Amatic SC;
+    color : white;
 }
+
+input{
+  outline : none;
+  background : trasnparent;
+}
+
+
 
 .gInput{
     font-style: italic;
     color: rgb(115 115 115);
     letter-spacing: 2px;
+  background-color : tranparent;
 }
 
 .add-button{
     font-family: Staatliches;
     letter-spacing: 1px;
-    text-align-center;
-    width : 5rem;
+    text-align : center;
+    width : 10rem;
 }
 
 h2{
@@ -49,8 +59,19 @@ ul{
   >li{
       display :flex;
       justify-content: space-between;
+      text-align : left;
+
+      >div{
+        width : 100%;
+        padding : 0 1rem;
+        margin : 0.5rem;
+
+
+
+      }
+
   }
-  
+
 }
 
 .delete-button{
@@ -59,7 +80,7 @@ ul{
     border: 2px solid white;
     border-style: solid;
     padding: 0.21rem;
-    border-color: white white white rgb(14 165 233);
+    border-color: white;
 }
 
 .delete-button:hover
@@ -86,5 +107,24 @@ ul{
     >span{
       cursor:pointer;
     }
+  }
+}
+
+
+@media screen and (min-width : 600px){
+  ul{
+    >li{
+        >div{
+          >p:first-child{
+              font-size : 1rem;
+          }
+          >p:last-child{
+            font-size : 0.8rem;
+          }
+
+        }
+
+    }
+
   }
 }

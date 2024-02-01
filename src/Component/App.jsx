@@ -1,4 +1,4 @@
-import './App.css'
+import "./styles/app.scss";
 import React, { useState, useEffect } from 'react';
 import Speech from 'react-speech';
 import { BsMicFill, BsMicMuteFill } from "react-icons/bs";
@@ -6,34 +6,92 @@ import { AiFillDelete } from "react-icons/ai";
 import { SiGoogleforms } from "react-icons/si";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-
+import { getMessaging, getToken } from "firebase/messaging";
+import {messaging} from "./firebase";
 
 const TodoList = () => {
   const [inputValue, setInputValue] = useState('');
+  const [inputValue2, setInputValue2] = useState('');
   const [items, setItems] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
   const [x, setX] = useState(0);
   const [text, settext] = useState("");
   const [time, setTime] = useState(new Date());
-
+  const [myToken , setMyToken ] = useState("");
   const msg = new SpeechSynthesisUtterance()
 
+  async function getPermission() {
+    const permission = await Notification.requestPermission();
+
+    if( permission === 'granted' ){
+      // Generate Token
+      const token = await getToken(messaging, {
+        vapidKey:
+          "BDmacvpeNC0NhCh1yeUKST0JEtsKVVrhCZiuSJOthb9nXmPEeN5rXJyLzfyE_ADR9wSwrFyUw0hTToPt5oS0_Fs",
+      });
+      setMyToken(token);
+      console.log("Token Gen", token);
+    }
+    else if( permission === "denied"){
+      console.log("permission denied");
+    }
+    
+  }
+  
   useEffect(() => {
     getFromLocalStorage();
+    getPermission();
   }, []);
 
-  const addToG = (element) => {
+  function extractSubject(inputString) {
+    // Define a regex pattern to match the subject
+    const regexPattern = /of subject\s*([\w\s.-]+)/i;
+
+    // Use the regex pattern to match against the input string
+    const match = inputString.match(regexPattern);
+
+    if (match) {
+      // Extracted subject
+      const [, subject] = match;
+      return subject;
+    } else {
+      return null; // Return null if no match is found
+    }
+  }
+  
+  const addToG = (element , element2) => {
+
+
+    const subject = extractSubject(element);
+    if (subject) {
+      console.log("Subject:", subject);
+      element2 = subject;
+      
+      const keyword = "of subject";
+
+      const keywordIndex = element.indexOf(keyword);
+
+      if (keywordIndex !== -1) {
+          element = element.substring(0, keywordIndex).trim();
+      }
+      
+    }
+     
     if (element !== '') {
       const timePattern = /(\d{1,2}:\d{2} [AaPp][Mm])/;
       const match = element.match(timePattern);
-
       if (match) {
+        const today = new Date();
+        const month = today.getMonth() + 1;
+        const year = today.getFullYear();
+        const date = today.getDate();
         const time = match[0];
         const item = {
-          id: Date.now(),
+          id:  Date.now(),
           name: element,
-          time: time,
+          time: `${date}/${month}/${year}`,
           check: false,
+          agenda : element2,
         };
 
         setItems([...items, item]);
@@ -47,7 +105,6 @@ const TodoList = () => {
         let notificationTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
 
         // Adjust for AM/PM
-
         if (ampm.toLowerCase() === 'pm' && hours < 12) {
           notificationTime.setHours(notificationTime.getHours() + 12);
         } else if (ampm.toLowerCase() === 'am' && hours === 12) {
@@ -59,13 +116,19 @@ const TodoList = () => {
         // Schedule the notification
         setTimeout(() => {
           speak(`sir time to, ${item.name}`);
-          toast(`Time to "${item.name}"`, { autoClose: 10000 });
+          toast(`"${item.agenda} : ${item.name}"`, { autoClose: 10000 });
         }, timeUntilNotification);
       } else {
+        const today = new Date();
+        const month = today.getMonth() + 1;
+        const year = today.getFullYear();
+        const date = today.getDate();
         const item = {
-          id: Date.now(),
+          id:  Date.now(),
           name: element,
           check: false,
+          time : `${date}/${month}/${year}`,
+          agenda : element2,
         };
 
         setItems([...items, item]);
@@ -85,10 +148,18 @@ const TodoList = () => {
   }
 
   const speakTodo = () => {
-    const textToSpeak = items.map((item) => item.name).join(', ');
+    
+    let textToSpeak = items.map((item) => item.name).join(', ');
     if (window.speechSynthesis) {
-      const msg = new SpeechSynthesisUtterance(textToSpeak);
-      window.speechSynthesis.speak(msg);
+      if (!textToSpeak.trim()) { 
+        let msg = new SpeechSynthesisUtterance("no task schedule sir,");
+         window.speechSynthesis.speak(msg);
+ }
+      else{
+        textToSpeak = "sir you need to," + textToSpeak;
+        let msg = new SpeechSynthesisUtterance(textToSpeak);
+        window.speechSynthesis.speak(msg);
+      }
     }
   };
 
@@ -100,9 +171,33 @@ const TodoList = () => {
     }
   };
 
+  function wordToNumber(word) {
+    const wordsToNumbers = {
+      zero: 0, one: 1, first:1, two: 2, second:2, three: 3, third : 3 ,four: 4, fourth:4,
+      five: 5, fifth : 5 , 
+      six: 6, sixth:6, seven: 7,seventh:7, eight: 8,eigth:8, nine: 9, ninth:9 ,ten: 10 ,           tenth:10 
+    };
+    return wordsToNumbers[word.toLowerCase()];
+  }
 
+  function extractNumberFromString(str) {
+    const words = str.split(' ');
+    let extractedNumber = null;
+
+    for (let i = 0; i < words.length; i++) {
+      const number = wordToNumber(words[i]);
+      if (!isNaN(number)) {
+        extractedNumber = number;
+        break;
+      }
+    }
+
+    return extractedNumber;
+  }
+
+  
   const [transcript, setTranscript] = useState('');
-  const recognition = new window.webkitSpeechRecognition(); // Create a speech recognition object
+  const recognition = new window.webkitSpeechRecognition();
 
   recognition.onresult = (event) => {
     const result = event.results[0][0].transcript;
@@ -120,6 +215,16 @@ const TodoList = () => {
 
     else if (resultLC.includes("delete all")) {
       deleteAll();
+    }
+    else if( resultLC.includes("delete") ){
+      const extractedInt = extractNumberFromString(resultLC);
+      if( extractedInt <= items.length ){
+        items.splice(extractedInt-1, 1);
+        setItems(items);
+        changeText();
+        addInLocalStorage(items);
+        display(items);
+      }
     }
     else if (resultLC.includes("plan")) {
       if (items.length > 0) {
@@ -139,7 +244,7 @@ const TodoList = () => {
     }
   };
 
-
+  
   const startRecognition = () => {
     recognition.start();
   };
@@ -150,21 +255,29 @@ const TodoList = () => {
   }
 
   const display = (itemList) => {
-
+    
     return (
       <ul className="gItems">
         {itemList.map((item) => (
-          <li key={item.id} data-key={item.id}>
+          <li className="bg-stone-900 px-2 my-1" key={item.id} data-key={item.id}>
             <input
               type="checkbox"
               className="form-checkbox text-pink-600"
               checked={item.check}
               onChange={() => toggle(item.id)}
             />
-            <span className='flex justify-center items-center'> {item.name} </span>
 
+          <div className="flex flex-col" > 
+            <div className="flex flex-row">
+              <p className="text-sm bg-stone-900 text-white p-1 me-1"> {item.time} </p>
+              <p className="text-sm bg-rose-600 text-white p-1"> {item.agenda} </p>
+            </div>
+            <p className='text-lg text-white'> {item.name}  </p>
+          </div>
+                
             <button
-              className="delete-button"
+
+              className="delete-button bg-white text-black"
               type="button"
               onClick={() => deleteItem(item.id)}
             >
@@ -194,7 +307,7 @@ const TodoList = () => {
 
     return (
       <div className="clock text-left">
-        <span className='text-left'>{formattedTime}</span>
+        <span className='text-left text-white'>{formattedTime}</span>
       </div>
     );
   };
@@ -255,48 +368,53 @@ const TodoList = () => {
 
   return (
     <div className="container mx-auto p-0 m-0">
-
-
-
-
+      
       <h1>To-Do</h1>
       <form
         className="gForm px-4 py-1  place-content-center"
         onClick={(e) => {
           e.preventDefault();
-          addToG(inputValue);
+          addToG(inputValue , inputValue2);
         }}
       >
-        <input
-          type="text"
-          className="gInput  placeholder:italic placeholder:text-slate-400 block bg-white w-1/2 border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm mx-auto w-full md:w-3/4 lg:w-1/2  sm:text-center md:text-left "
-          placeholder="Add To-Do"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
+
+        <div className='inputDiv1 flex flex-col lg:flex-row justify-center'>
+          <input
+            className='gInput bg-transparent placeholder:italic  placeholder:text-white block border border-slate-300  py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm w-full md:w-1/3 lg:w-1/3 sm:text-center md:text-left m-1 text-white'
+            type="text" placeholder='Add Subject' value={inputValue2}
+            onChange={(e)=> setInputValue2(e.target.value)} />
+          
+          <input
+            type="text"
+            className="gInput  placeholder:italic placeholder:text-white block bg-transparent border border-slate-300 py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm w-full md:w-1/2 lg:w-1/2  sm:text-center md:text-left m-1"
+            placeholder="Add To-Do"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+        </div>
+        
         <button
-          className="add-button  text-center mx-auto mt-5  border-4 border-rose-600 shadow-lg hover:bg-rose-600 hover:text-white rounded ..."
+          className="add-button text-center mx-auto mt-5 py-2 px-8 bg-rose-600 shadow-lg hover:bg-rose-600 text-white text-xl hover:bg-white hover:text-black  rounded ..."
           type="submit"
         >
           Add
         </button>
       </form>
 
-
-      <h2 className="GroceryList text-neutrsl-800 tracking-wider text-xl mb-1 font-bold mt-10">
+      <h2 className="GroceryList  text-white tracking-wider text-2xl mb-1 mt-10">
         To-Do List
       </h2>
 
-      <div className="ItemDiv mx-2 border-4  p-3 md:w-3/2 mb-40">
+      <div className="ItemDiv mx-2 text-white border-4 rounded-lg  p-3 md:w-3/2 mb-40">
         {items.length === 0 ? <p>No To do's</p> : display(items)}
       </div>
 
-      <div className='p-2 absolute bottom-20 right-0 mt-4 mb-2  border-2 text-left bg-zinc-100 rounded-lg me-2'>
+      <div className='p-2 lg:absolute bottom-20 right-0 mt-4 mb-2  border-2 text-left bg-zinc-100 rounded-lg me-2'>
         <h6 className="font-bold ">Transcript:</h6>
         <p className='text-xs font-thin tracking-tighter text-gray-700'> {transcript}... </p>
       </div>
 
-      <div className="footer h-16 z-0 bg-slate-600/20 w-full absolute bottom-0 left-0
+      <div className="footer h-16 z-0 bg-slate-600/20 w-full lg:absolute bottom-0 left-0 
                       flex justify-center items-center space-x-4 p-10">
 
 
